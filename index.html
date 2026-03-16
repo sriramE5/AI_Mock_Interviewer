@@ -967,7 +967,35 @@
                         isRecording = false;
                         micButton.classList.remove('recording');
                         micStatus.textContent = 'Click to speak';
-                        showToast('Speech recognition error: ' + event.error);
+                        
+                        // Handle specific error types
+                        let errorMessage = 'Speech recognition error';
+                        switch(event.error) {
+                            case 'no-speech':
+                                errorMessage = 'No speech detected. Please try again.';
+                                break;
+                            case 'audio-capture':
+                                errorMessage = 'Microphone not available. Please check permissions.';
+                                break;
+                            case 'not-allowed':
+                                errorMessage = 'Microphone permission denied. Please allow microphone access.';
+                                break;
+                            case 'network':
+                                errorMessage = 'Network error. Please check your connection.';
+                                break;
+                            case 'service-not-allowed':
+                                errorMessage = 'Speech recognition service not allowed.';
+                                break;
+                            default:
+                                errorMessage = 'Speech recognition error: ' + event.error;
+                        }
+                        
+                        showToast(errorMessage);
+                        
+                        // Restart auto mic if enabled and interview is ongoing
+                        if (isAutoMicEnabled && interviewInProgress && !currentSpeechText) {
+                            setTimeout(startAutoMicTimer, 2000); // Wait 2 seconds before restarting
+                        }
                     };
 
                     recognition.onend = function () {
@@ -1026,6 +1054,12 @@
                     function populateVoiceList() {
                         voices = synth.getVoices();
                         voiceSelect.innerHTML = '';
+
+                        if (voices.length === 0) {
+                            // Retry loading voices after delay
+                            setTimeout(populateVoiceList, 100);
+                            return;
+                        }
 
                         // Filter for English voices
                         const englishVoices = voices.filter(voice => voice.lang.includes('en'));
