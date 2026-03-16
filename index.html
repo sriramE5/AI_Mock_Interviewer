@@ -420,7 +420,20 @@
             }
         }
 
-        /* Input Container */
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1.0);
+            }
+        }
+
+        /* Input Container - Voice Only Mode */
         .input-container {
             display: flex;
             flex-direction: column;
@@ -432,112 +445,71 @@
             bottom: 0;
             left: 0;
             right: 0;
+            align-items: center;
+            gap: 1rem;
         }
 
-        .input-wrapper {
-            position: relative;
-            background-color: white;
-            border-radius: 24px;
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            min-height: 50px;
-            display: flex;
-            align-items: flex-end;
-            padding-bottom: 8px;
-        }
-
-        #user-input {
-            flex: 1;
-            border: none;
-            background: transparent;
-            padding: 8px 0;
-            font-family: var(--font-family);
-            font-size: 1rem;
-            resize: none;
-            outline: none;
-            max-height: calc(1.5em * 10);
-            min-height: calc(1.5em * 1);
-            overflow-y: auto;
-            line-height: 1.5em;
-            align-self: stretch;
-            margin-right: 8px;
-        }
-
-        .input-buttons {
+        .mic-status {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-left: auto;
-            padding-bottom: 4px;
+            gap: 1rem;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--bg-secondary);
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
         }
 
-        .input-button {
+        .mic-button-large {
             background: none;
             border: none;
             color: var(--text-secondary);
             cursor: pointer;
-            font-size: 1.1rem;
-            padding: 8px;
+            font-size: 2rem;
+            padding: 1rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background-color 0.2s;
+            transition: all 0.2s;
+            width: 60px;
+            height: 60px;
         }
 
-        .input-button:hover {
+        .mic-button-large:hover {
             background-color: rgba(0, 0, 0, 0.05);
         }
 
-        #mic-button {
-            color: var(--text-secondary);
-        }
-
-        #mic-button.recording {
+        .mic-button-large.recording {
             color: #ff4d4d;
+            background-color: rgba(255, 77, 77, 0.1);
+            animation: pulse 1.5s infinite;
         }
 
-        #send-button {
-            color: var(--accent-primary);
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 77, 77, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 77, 77, 0);
+            }
         }
 
-        #send-button:disabled {
+        .mic-status-text {
+            font-size: 1rem;
             color: var(--text-secondary);
-            opacity: 0.5;
-            cursor: not-allowed;
         }
 
-        #feedback-button {
-            color: #4CAF50;
-        }
-
-        #feedback-button.mic-mode {
-            color: var(--text-secondary);
-        }
-
-        #feedback-button.mic-mode.recording {
-            color: #ff4d4d;
-        }
-
-        .interview-controls {
-            display: flex;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-
-        #end-interview-btn {
-            padding: 0.5rem 1rem;
-            background-color: #f44336;
+        .auto-mic-indicator {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            background-color: #4CAF50;
             color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            font-size: 0.9rem;
-            transition: background-color 0.2s;
-        }
-
-        #end-interview-btn:hover {
-            background-color: #d32f2f;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 0.5rem;
         }
 
         /* Summary Screen */
@@ -784,6 +756,21 @@
                                 <select id="voice-select"></select>
                             </div>
                         </div>
+                        <div class="settings-section">
+                            <h3>Auto Mic Settings</h3>
+                            <div class="speech-toggle">
+                                <label class="toggle-switch">
+                                    <input type="checkbox" id="auto-mic-toggle" checked>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                                <span>Auto Microphone</span>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <label for="mic-delay" style="font-size: 0.9rem; color: var(--text-secondary);">Speech Delay (seconds):</label>
+                                <input type="range" id="mic-delay" min="1" max="10" value="5" style="width: 100%; margin-top: 5px;">
+                                <span id="mic-delay-value" style="font-size: 0.8rem; color: var(--text-primary);">5s</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -866,20 +853,19 @@
 
         <!-- Input Container (only shown during interview) -->
         <div class="input-container" id="input-container">
-            <div class="input-wrapper">
-                <textarea id="user-input" placeholder="Type your answer here..." rows="1"></textarea>
-                <div class="input-buttons">
-                    <button class="input-button" id="feedback-button" title="Request Feedback"><i
-                            class="fas fa-comment-dots"></i></button>
-                    <button class="input-button" id="mic-button" title="Speak"><i
-                            class="fas fa-microphone"></i></button>
-                    <button class="input-button" id="send-button" title="Send Message"><i
-                            class="fas fa-paper-plane"></i></button>
+            <div class="mic-status">
+                <button class="mic-button-large" id="mic-button" title="Speak">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <div class="mic-status-text">
+                    <span id="mic-status">Click to speak</span>
+                    <span class="auto-mic-indicator" id="auto-mic-indicator">Auto</span>
                 </div>
             </div>
             <div class="command-buttons">
                 <button class="command-btn" id="repeat-btn">Repeat Question</button>
                 <button class="command-btn" id="clarify-btn">Ask for Clarification</button>
+                <button class="command-btn" id="feedback-btn">Request Feedback</button>
             </div>
             <div class="interview-controls">
                 <button id="end-interview-btn">End Interview</button>
@@ -898,10 +884,10 @@
             const interviewScreen = document.getElementById('interview-screen');
             const summaryScreen = document.getElementById('summary-screen');
             const chatContainer = document.getElementById('chat-container');
-            const userInput = document.getElementById('user-input');
-            const sendButton = document.getElementById('send-button');
-            const micButton = document.getElementById('mic-button'); // Mic button when input is empty
-            const feedbackButton = document.getElementById('feedback-button'); // Acts as feedback or mic when input has text
+            const micButton = document.getElementById('mic-button');
+            const micStatus = document.getElementById('mic-status');
+            const autoMicIndicator = document.getElementById('auto-mic-indicator');
+            const feedbackBtn = document.getElementById('feedback-btn');
             const endInterviewBtn = document.getElementById('end-interview-btn');
             const newInterviewBtn = document.getElementById('new-interview-btn');
             const loadingIndicator = document.getElementById('loading-indicator');
@@ -916,6 +902,9 @@
             const voiceSelect = document.getElementById('voice-select');
             const repeatBtn = document.getElementById('repeat-btn');
             const clarifyBtn = document.getElementById('clarify-btn');
+            const autoMicToggle = document.getElementById('auto-mic-toggle');
+            const micDelaySlider = document.getElementById('mic-delay');
+            const micDelayValue = document.getElementById('mic-delay-value');
 
             // State variables
             let currentDomain = '';
@@ -924,17 +913,18 @@
             let recognition = null;
             let messageBeingSent = false;
             let interviewContext = {
-                questions: [],
-                answers: [],
-                feedback: [],
-                currentQuestionIndex: 0,
-                interviewStage: 'basic', // Start with basic questions
-                lastUserResponse: '' // Track the last user response for context
+                sessionId: '',
+                domain: '',
+                lastUserResponse: ''
             };
             let isSpeechEnabled = true;
+            let isAutoMicEnabled = true;
+            let micDelaySeconds = 5;
+            let autoMicTimer = null;
             let synth = window.speechSynthesis;
             let voices = [];
             let lastQuestion = '';
+            let currentSpeechText = '';
 
             // Server URL for AI backend (same as in the original code)
             const serverUrl = "http://127.0.0.1:8000";
@@ -953,14 +943,10 @@
 
                     recognition.onstart = function () {
                         isRecording = true;
-                        // Update correct button based on mode
-                        const hasText = userInput.value.trim() !== '';
-                        if (hasText) {
-                            feedbackButton.classList.add('recording');
-                        } else {
-                            micButton.classList.add('recording');
-                        }
+                        micButton.classList.add('recording');
+                        micStatus.textContent = 'Listening...';
                         showToast('Listening...');
+                        clearAutoMicTimer();
                     };
 
                     recognition.onresult = function (event) {
@@ -969,30 +955,67 @@
                             .map(result => result.transcript)
                             .join('');
 
-                        // Append transcript to existing text if any
-                        const currentText = userInput.value;
-                        const separator = currentText.length > 0 && currentText.slice(-1) !== ' ' ? ' ' : '';
-                        userInput.value = currentText + separator + transcript;
-                        userInput.dispatchEvent(new Event('input'));
+                        currentSpeechText = transcript;
+                        addMessageToUI('user', transcript);
+                        
+                        // Auto send the speech result
+                        sendVoiceMessage(transcript);
                     };
 
                     recognition.onerror = function (event) {
                         console.error('Speech recognition error', event.error);
                         isRecording = false;
                         micButton.classList.remove('recording');
-                        feedbackButton.classList.remove('recording');
+                        micStatus.textContent = 'Click to speak';
                         showToast('Speech recognition error: ' + event.error);
                     };
 
                     recognition.onend = function () {
                         isRecording = false;
                         micButton.classList.remove('recording');
-                        feedbackButton.classList.remove('recording');
+                        micStatus.textContent = 'Click to speak';
+                        
+                        // Restart auto mic if enabled and interview is ongoing
+                        if (isAutoMicEnabled && interviewInProgress && !currentSpeechText) {
+                            startAutoMicTimer();
+                        }
                     };
                 } else {
                     micButton.style.display = 'none';
-                    feedbackButton.style.display = 'none'; // Hide feedback button too if no mic
                     showToast('Speech recognition not supported in this browser');
+                }
+            }
+
+            // Auto mic timer functions
+            function startAutoMicTimer() {
+                clearAutoMicTimer();
+                autoMicTimer = setTimeout(() => {
+                    if (isAutoMicEnabled && interviewInProgress && !isRecording) {
+                        startRecording();
+                    }
+                }, micDelaySeconds * 1000);
+            }
+
+            function clearAutoMicTimer() {
+                if (autoMicTimer) {
+                    clearTimeout(autoMicTimer);
+                    autoMicTimer = null;
+                }
+            }
+
+            function startRecording() {
+                if (recognition && !isRecording) {
+                    try {
+                        recognition.start();
+                    } catch (error) {
+                        console.error('Failed to start recognition:', error);
+                    }
+                }
+            }
+
+            function stopRecording() {
+                if (recognition && isRecording) {
+                    recognition.stop();
                 }
             }
 
@@ -1046,31 +1069,6 @@
                 }
             }
 
-            // Function to speak text
-            function speakText(text) {
-                if (!isSpeechEnabled || !synth) return;
-
-                // Cancel any ongoing speech
-                synth.cancel();
-
-                // Create a new utterance
-                const utterance = new SpeechSynthesisUtterance(text);
-
-                // Set the selected voice
-                const selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-voice-index');
-                if (selectedOption && voices[selectedOption]) {
-                    utterance.voice = voices[selectedOption];
-                }
-
-                // Set other properties
-                utterance.pitch = 1;
-                utterance.rate = 1;
-                utterance.volume = 1;
-
-                // Speak the text
-                synth.speak(utterance);
-            }
-
             // Event Listeners
             domainButtons.forEach(button => {
                 button.addEventListener('click', function () {
@@ -1105,6 +1103,154 @@
                     if (synth) synth.cancel(); // Stop any ongoing speech
                 }
             });
+
+            // Auto mic toggle
+            autoMicToggle.addEventListener('change', function () {
+                isAutoMicEnabled = this.checked;
+                autoMicIndicator.style.display = isAutoMicEnabled ? 'inline-block' : 'none';
+                if (isAutoMicEnabled) {
+                    showToast('Auto microphone enabled');
+                    if (interviewInProgress && !isRecording) {
+                        startAutoMicTimer();
+                    }
+                } else {
+                    showToast('Auto microphone disabled');
+                    clearAutoMicTimer();
+                }
+            });
+
+            // Mic delay slider
+            micDelaySlider.addEventListener('input', function () {
+                micDelaySeconds = parseInt(this.value);
+                micDelayValue.textContent = micDelaySeconds + 's';
+            });
+
+            // Mic button click
+            micButton.addEventListener('click', function () {
+                if (!isRecording) {
+                    startRecording();
+                } else {
+                    stopRecording();
+                }
+            });
+
+            // Feedback button
+            feedbackBtn.addEventListener('click', function () {
+                requestFeedback();
+            });
+
+            // Voice message handling function
+            async function sendVoiceMessage(transcript) {
+                if (messageBeingSent) return;
+                
+                messageBeingSent = true;
+                currentSpeechText = transcript;
+
+                // Check for special commands
+                if (transcript.toLowerCase() === 'end interview') {
+                    endInterview();
+                    messageBeingSent = false;
+                    return;
+                }
+
+                // Check if message is a command
+                const commandType = isCommand(transcript);
+                if (commandType) {
+                    if (commandType === 'repeat') {
+                        if (lastQuestion) {
+                            addMessageToUI('interviewer', lastQuestion);
+                            speakText(lastQuestion);
+                        } else {
+                            addMessageToUI('system', 'No question to repeat');
+                        }
+                    } else if (commandType === 'clarify') {
+                        await requestClarification();
+                    }
+                    messageBeingSent = false;
+                    return;
+                }
+
+                // Update last user response for context
+                interviewContext.lastUserResponse = transcript;
+
+                // Check if feedback was requested
+                if (transcript.toLowerCase().includes('give feedback') ||
+                    transcript.toLowerCase().includes('evaluate')) {
+                    await requestFeedback();
+                } else {
+                    // Send answer to backend and get next question
+                    loadingIndicator.style.display = 'flex';
+                    try {
+                        const response = await fetch(`${serverUrl}/api/interview/answer`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                session_id: interviewContext.sessionId,
+                                answer: transcript
+                            }),
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const data = await response.json();
+                        const rawQuestion = data.reply || "I don't have any more questions.";
+                        const question = cleanAIResponse(rawQuestion);
+
+                        // Store the question
+                        lastQuestion = question;
+
+                        // Add interviewer message to UI
+                        addMessageToUI('interviewer', question);
+
+                        // Speak the question
+                        speakText(question);
+
+                    } catch (error) {
+                        console.error('Error sending answer:', error);
+                        addMessageToUI('system', 'Error processing answer. Please try again.');
+                    } finally {
+                        loadingIndicator.style.display = 'none';
+                    }
+                }
+
+                messageBeingSent = false;
+                currentSpeechText = '';
+            }
+
+            // Function to speak text with auto mic trigger
+            function speakText(text) {
+                if (!isSpeechEnabled || !synth) return;
+
+                // Cancel any ongoing speech and auto mic timer
+                synth.cancel();
+                clearAutoMicTimer();
+
+                // Create a new utterance
+                const utterance = new SpeechSynthesisUtterance(text);
+
+                // Set the selected voice
+                const selectedOption = voiceSelect.selectedOptions[0].getAttribute('data-voice-index');
+                if (selectedOption && voices[selectedOption]) {
+                    utterance.voice = voices[selectedOption];
+                }
+
+                // Set other properties
+                utterance.pitch = 1;
+                utterance.rate = 1;
+                utterance.volume = 1;
+
+                // Start auto mic timer after speech ends
+                utterance.onend = function () {
+                    if (isAutoMicEnabled && interviewInProgress) {
+                        startAutoMicTimer();
+                    }
+                };
+
+                // Speak the text
+                synth.speak(utterance);
+            }
 
             // Command buttons
             repeatBtn.addEventListener('click', function () {
@@ -1144,85 +1290,6 @@
                     // Hide custom domain input if it was open
                     customDomainInput.classList.add('hidden');
                 });
-            });
-
-            // Helper function to update button visibility and state based on input content
-            function updateInputButtonState() {
-                const hasText = userInput.value.trim() !== '';
-
-                // Toggle button visibility
-                micButton.style.display = hasText ? 'none' : 'flex'; // Mic only when empty
-                sendButton.style.display = hasText ? 'flex' : 'none'; // Send only when text
-                feedbackButton.style.display = 'flex'; // Always show feedback/mic button
-
-                // Change feedback button icon and title based on text presence
-                const feedbackIcon = feedbackButton.querySelector('i');
-                if (hasText) {
-                    feedbackIcon.className = 'fas fa-microphone'; // Change to mic icon
-                    feedbackButton.title = 'Append Speech';
-                    feedbackButton.classList.add('mic-mode');
-                } else {
-                    feedbackIcon.className = 'fas fa-comment-dots'; // Change back to feedback icon
-                    feedbackButton.title = 'Request Feedback';
-                    feedbackButton.classList.remove('mic-mode');
-                }
-
-                // Enable/disable send button
-                sendButton.disabled = !hasText;
-            }
-
-            // Dynamic input bar expansion
-            userInput.addEventListener('input', function () {
-                // Reset height to calculate proper scrollHeight
-                userInput.style.height = 'auto';
-
-                // Get line height from computed style
-                const lineHeight = parseFloat(getComputedStyle(userInput).lineHeight) || 24;
-
-                // Calculate number of lines (minimum 1, maximum 10)
-                const minHeight = lineHeight * 1;
-                const maxHeight = lineHeight * 10;
-
-                // Set new height based on content
-                const newHeight = Math.min(Math.max(userInput.scrollHeight, minHeight), maxHeight);
-                userInput.style.height = newHeight + 'px';
-
-                // Update button state based on current input value
-                updateInputButtonState();
-            });
-
-            sendButton.addEventListener('click', sendUserMessage);
-
-            userInput.addEventListener('keydown', function (e) {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    sendUserMessage();
-                }
-            });
-
-            // Mic button (only active when input is empty)
-            micButton.addEventListener('click', function () {
-                if (!isRecording && recognition && userInput.value.trim() === '') {
-                    recognition.start();
-                } else if (isRecording && recognition) {
-                    recognition.stop();
-                }
-            });
-
-            // Feedback button (acts as feedback or mic)
-            feedbackButton.addEventListener('click', function () {
-                const hasText = userInput.value.trim() !== '';
-                if (hasText) {
-                    // Act as mic button (append speech)
-                    if (!isRecording && recognition) {
-                        recognition.start();
-                    } else if (isRecording && recognition) {
-                        recognition.stop();
-                    }
-                } else {
-                    // Act as feedback button
-                    requestFeedback();
-                }
             });
 
             endInterviewBtn.addEventListener('click', endInterview);
@@ -1288,15 +1355,13 @@
                     lastUserResponse: ''
                 };
                 lastQuestion = '';
+                currentSpeechText = '';
 
                 // Clear chat container
                 chatContainer.innerHTML = '';
 
-                // Reset input
-                userInput.value = '';
-                userInput.dispatchEvent(new Event('input'));
-                userInput.placeholder = 'Type your answer here...';
-                userInput.disabled = false;
+                // Clear auto mic timer
+                clearAutoMicTimer();
 
                 // Stop any ongoing speech
                 if (synth) synth.cancel();
@@ -1332,100 +1397,6 @@
 
                 return false;
             }
-
-            async function sendUserMessage() {
-                const messageText = userInput.value.trim();
-                if (!messageText || messageBeingSent) return;
-
-                messageBeingSent = true;
-                sendButton.disabled = true;
-                userInput.value = '';
-                userInput.dispatchEvent(new Event('input'));
-                userInput.disabled = true;
-
-                // Add user message to UI
-                addMessageToUI('user', messageText);
-
-                // Check for special commands
-                if (messageText.toLowerCase() === 'end interview') {
-                    endInterview();
-                    messageBeingSent = false;
-                    userInput.disabled = false;
-                    return;
-                }
-
-                // Check if message is a command
-                const commandType = isCommand(messageText);
-                if (commandType) {
-                    if (commandType === 'repeat') {
-                        // Repeat the last question
-                        if (lastQuestion) {
-                            addMessageToUI('interviewer', lastQuestion);
-                            speakText(lastQuestion);
-                        } else {
-                            addMessageToUI('system', 'No question to repeat');
-                        }
-                    } else if (commandType === 'clarify') {
-                        // Request clarification
-                        await requestClarification();
-                    }
-
-                    messageBeingSent = false;
-                    userInput.disabled = false;
-                    return;
-                }
-
-                // Update last user response for UI tracking if needed
-                interviewContext.lastUserResponse = messageText;
-
-                // Check if feedback was requested (simple check, though backend can handle this too if we want)
-                if (messageText.toLowerCase().includes('give feedback') ||
-                    messageText.toLowerCase().includes('evaluate')) {
-                    await requestFeedback();
-                } else {
-                    // Send answer to backend and get next question
-                    loadingIndicator.style.display = 'flex';
-                    try {
-                        const response = await fetch(`${serverUrl}/api/interview/answer`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                session_id: interviewContext.sessionId,
-                                answer: messageText
-                            }),
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-
-                        const data = await response.json();
-                        const rawQuestion = data.reply || "I don't have any more questions.";
-                        const question = cleanAIResponse(rawQuestion);
-
-                        // Store the question
-                        lastQuestion = question;
-
-                        // Add interviewer message to UI
-                        addMessageToUI('interviewer', question);
-
-                        // Speak the question
-                        speakText(question);
-
-                    } catch (error) {
-                        console.error('Error sending answer:', error);
-                        addMessageToUI('system', 'Error processing answer. Please try again.');
-                    } finally {
-                        loadingIndicator.style.display = 'none';
-                    }
-                }
-
-                messageBeingSent = false;
-                userInput.disabled = false;
-            }
-
-            // formatContextForPrompt function removed as context is handled by backend
-
 
             // Function to clean AI response (remove prefixes)
             function cleanAIResponse(rawResponse) {
@@ -1629,7 +1600,6 @@
             initSpeechRecognition();
             initTextToSpeech();
             switchToScreen('welcome');
-            updateInputButtonState();
         });
     </script>
 </body>
