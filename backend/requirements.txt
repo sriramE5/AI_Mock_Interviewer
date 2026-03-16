@@ -11,3 +11,4 @@ google-genai
 markdown2
 PyPDF2
 python-docx
+python-multipart
