@@ -652,74 +652,94 @@
             }
         }
 
-        /* Category Selection Styles */
-        .category-tabs {
+        /* Voice Controls */
+        .voice-controls {
             display: flex;
             justify-content: center;
-            gap: 1rem;
-            margin: 1.5rem 0;
-            border-bottom: 2px solid var(--border-color);
+            margin: 1rem 0;
         }
 
-        .category-tab {
-            background: none;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            cursor: pointer;
-            position: relative;
-            transition: color 0.2s;
-        }
-
-        .category-tab:hover {
-            color: var(--accent-primary);
-        }
-
-        .category-tab.active {
-            color: var(--accent-primary);
-        }
-
-        .category-tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 100%;
-            height: 3px;
+        .send-button {
             background-color: var(--accent-primary);
-            border-radius: 3px 3px 0 0;
+            color: white;
+            border: none;
+            padding: 0.75rem 2rem;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 120px;
         }
 
-        .domain-group {
-            display: none;
+        .send-button:hover:not(:disabled) {
+            background-color: var(--accent-primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
         }
 
-        .domain-group.active {
-            display: block;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        .custom-btn {
+        .send-button:disabled {
             background-color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.6;
         }
 
-        .custom-btn:hover {
-            background-color: var(--text-primary);
+        .send-button:disabled:hover {
+            transform: none;
+            box-shadow: none;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-5px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .send-button-inside {
+            background-color: var(--accent-primary);
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 60px;
+            margin-left: 8px;
         }
+
+        .send-button-inside:hover:not(:disabled) {
+            background-color: var(--accent-primary-dark);
+            transform: scale(1.05);
+        }
+
+        .send-button-inside:disabled {
+            background-color: var(--text-secondary);
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .mic-button-large {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .speech-preview {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            z-index: 1000;
+        }
+
+        /* Category Selection Styles */
     </style>
 </head>
 
@@ -754,21 +774,6 @@
                             <h3>Voice Selection</h3>
                             <div class="voice-settings">
                                 <select id="voice-select"></select>
-                            </div>
-                        </div>
-                        <div class="settings-section">
-                            <h3>Auto Mic Settings</h3>
-                            <div class="speech-toggle">
-                                <label class="toggle-switch">
-                                    <input type="checkbox" id="auto-mic-toggle" checked>
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span>Auto Microphone</span>
-                            </div>
-                            <div style="margin-top: 10px;">
-                                <label for="mic-delay" style="font-size: 0.9rem; color: var(--text-secondary);">Speech Delay (seconds):</label>
-                                <input type="range" id="mic-delay" min="1" max="10" value="5" style="width: 100%; margin-top: 5px;">
-                                <span id="mic-delay-value" style="font-size: 0.8rem; color: var(--text-primary);">5s</span>
                             </div>
                         </div>
                     </div>
@@ -856,11 +861,12 @@
             <div class="mic-status">
                 <button class="mic-button-large" id="mic-button" title="Speak">
                     <i class="fas fa-microphone"></i>
+                    <button class="send-button-inside" id="send-button" disabled>Send</button>
                 </button>
                 <div class="mic-status-text">
-                    <span id="mic-status">Click to speak</span>
-                    <span class="auto-mic-indicator" id="auto-mic-indicator">Auto</span>
+                    <span id="mic-status"></span>
                 </div>
+                <div class="speech-preview" id="speech-preview" style="display: none;"></div>
             </div>
             <div class="command-buttons">
                 <button class="command-btn" id="repeat-btn">Repeat Question</button>
@@ -886,7 +892,8 @@
             const chatContainer = document.getElementById('chat-container');
             const micButton = document.getElementById('mic-button');
             const micStatus = document.getElementById('mic-status');
-            const autoMicIndicator = document.getElementById('auto-mic-indicator');
+            const sendButton = document.getElementById('send-button');
+            const speechPreview = document.getElementById('speech-preview');
             const feedbackBtn = document.getElementById('feedback-btn');
             const endInterviewBtn = document.getElementById('end-interview-btn');
             const newInterviewBtn = document.getElementById('new-interview-btn');
@@ -902,9 +909,6 @@
             const voiceSelect = document.getElementById('voice-select');
             const repeatBtn = document.getElementById('repeat-btn');
             const clarifyBtn = document.getElementById('clarify-btn');
-            const autoMicToggle = document.getElementById('auto-mic-toggle');
-            const micDelaySlider = document.getElementById('mic-delay');
-            const micDelayValue = document.getElementById('mic-delay-value');
 
             // State variables
             let currentDomain = '';
@@ -918,10 +922,6 @@
                 lastUserResponse: ''
             };
             let isSpeechEnabled = true;
-            let isAutoMicEnabled = true;
-            let micDelaySeconds = 5;
-            let autoMicTimer = null;
-            let speechDetectionTimer = null;
             let synth = window.speechSynthesis;
             let voices = [];
             let lastQuestion = '';
@@ -938,8 +938,8 @@
             function initSpeechRecognition() {
                 if ('webkitSpeechRecognition' in window) {
                     recognition = new webkitSpeechRecognition();
-                    recognition.continuous = false;
-                    recognition.interimResults = false;
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
                     recognition.lang = 'en-US';
 
                     recognition.onstart = function () {
@@ -947,7 +947,6 @@
                         micButton.classList.add('recording');
                         micStatus.textContent = 'Listening...';
                         showToast('Listening...');
-                        clearAutoMicTimer();
                     };
 
                     recognition.onresult = function (event) {
@@ -956,13 +955,13 @@
                             .map(result => result.transcript)
                             .join('');
 
-                        // Only process if we have a final result and haven't already processed it
+                        // Only process if we have a final result
                         if (event.results[event.results.length - 1].isFinal && transcript.trim() !== '') {
                             currentSpeechText = transcript;
-                            addMessageToUI('user', transcript);
-                            
-                            // Auto send the speech result
-                            sendVoiceMessage(transcript);
+                            speechPreview.textContent = transcript;
+                            speechPreview.style.display = 'block';
+                            sendButton.disabled = false;
+                            sendButton.textContent = 'Send';
                         }
                     };
 
@@ -971,7 +970,6 @@
                         isRecording = false;
                         micButton.classList.remove('recording');
                         micStatus.textContent = 'Click to speak';
-                        clearSpeechDetectionTimer();
                         
                         // Handle specific error types
                         let errorMessage = 'Speech recognition error';
@@ -992,47 +990,19 @@
                                 errorMessage = 'Speech recognition service not allowed.';
                                 break;
                             case 'aborted':
-                                // Silent handling for aborted - don't show any error
+                                // Silent handling for aborted
                                 return;
                             default:
                                 errorMessage = 'Speech recognition error: ' + event.error;
                         }
                         
                         showToast(errorMessage);
-                        
-                        // For 'no-speech' error, restart auto mic if enabled
-                        if (event.error === 'no-speech' && isAutoMicEnabled && interviewInProgress) {
-                            setTimeout(() => {
-                                if (!isRecording) {
-                                    startAutoMicTimer();
-                                }
-                            }, 1000);
-                        }
                     };
 
                     recognition.onend = function () {
                         isRecording = false;
                         micButton.classList.remove('recording');
                         micStatus.textContent = 'Click to speak';
-                        clearSpeechDetectionTimer();
-                        
-                        // If we have speech text, it was already processed in onresult
-                        if (currentSpeechText) {
-                            // Clear speech text after processing
-                            setTimeout(() => {
-                                currentSpeechText = '';
-                            }, 1000);
-                        } else {
-                            // No speech detected, restart auto mic if enabled
-                            if (isAutoMicEnabled && interviewInProgress) {
-                                // Add small delay to prevent rapid restart cycles
-                                setTimeout(() => {
-                                    if (!isRecording && !currentSpeechText) {
-                                        startAutoMicTimer();
-                                    }
-                                }, 500);
-                            }
-                        }
                     };
                 } else {
                     micButton.style.display = 'none';
@@ -1040,28 +1010,10 @@
                 }
             }
 
-            // Auto mic timer functions
-            function startAutoMicTimer() {
-                clearAutoMicTimer();
-                autoMicTimer = setTimeout(() => {
-                    if (isAutoMicEnabled && interviewInProgress && !isRecording) {
-                        startRecording();
-                    }
-                }, micDelaySeconds * 1000);
-            }
-
-            function clearAutoMicTimer() {
-                if (autoMicTimer) {
-                    clearTimeout(autoMicTimer);
-                    autoMicTimer = null;
-                }
-            }
-
             function startRecording() {
                 if (recognition && !isRecording) {
                     try {
                         recognition.start();
-                        startSpeechDetectionTimer();
                     } catch (error) {
                         console.error('Failed to start recognition:', error);
                     }
@@ -1071,20 +1023,6 @@
             function stopRecording() {
                 if (recognition && isRecording) {
                     recognition.stop();
-                }
-            }
-
-            // Speech detection timer functions
-            function startSpeechDetectionTimer() {
-                clearSpeechDetectionTimer();
-                // Don't start timeout timer - let user speak naturally
-                // Only stop when user actually stops speaking (handled by onend)
-            }
-
-            function clearSpeechDetectionTimer() {
-                if (speechDetectionTimer) {
-                    clearTimeout(speechDetectionTimer);
-                    speechDetectionTimer = null;
                 }
             }
 
@@ -1179,33 +1117,23 @@
                 }
             });
 
-            // Auto mic toggle
-            autoMicToggle.addEventListener('change', function () {
-                isAutoMicEnabled = this.checked;
-                autoMicIndicator.style.display = isAutoMicEnabled ? 'inline-block' : 'none';
-                if (isAutoMicEnabled) {
-                    showToast('Auto microphone enabled');
-                    if (interviewInProgress && !isRecording) {
-                        startAutoMicTimer();
-                    }
-                } else {
-                    showToast('Auto microphone disabled');
-                    clearAutoMicTimer();
-                }
-            });
-
-            // Mic delay slider
-            micDelaySlider.addEventListener('input', function () {
-                micDelaySeconds = parseInt(this.value);
-                micDelayValue.textContent = micDelaySeconds + 's';
-            });
-
             // Mic button click
             micButton.addEventListener('click', function () {
                 if (!isRecording) {
                     startRecording();
                 } else {
                     stopRecording();
+                }
+            });
+
+            // Send button click (inside mic button)
+            sendButton.addEventListener('click', function (e) {
+                e.stopPropagation(); // Prevent mic button click
+                if (currentSpeechText && !messageBeingSent) {
+                    sendVoiceMessage(currentSpeechText);
+                    sendButton.disabled = true;
+                    sendButton.textContent = 'Send';
+                    currentSpeechText = '';
                 }
             });
 
@@ -1220,6 +1148,13 @@
                 
                 messageBeingSent = true;
                 currentSpeechText = transcript;
+
+                // Add message to chat
+                addMessageToUI('user', transcript);
+                
+                // Clear preview
+                speechPreview.style.display = 'none';
+                speechPreview.textContent = '';
 
                 // Check for special commands
                 if (transcript.toLowerCase() === 'end interview') {
@@ -1289,18 +1224,21 @@
                         loadingIndicator.style.display = 'none';
                     }
                 }
-
                 messageBeingSent = false;
                 currentSpeechText = '';
             }
 
-            // Function to speak text with auto mic trigger
+            // Function to speak text with manual mic trigger
             function speakText(text) {
                 if (!isSpeechEnabled || !synth) return;
 
-                // Cancel any ongoing speech and auto mic timer
+                // Stop recording when AI speaks
+                if (isRecording) {
+                    stopRecording();
+                }
+
+                // Cancel any ongoing speech
                 synth.cancel();
-                clearAutoMicTimer();
 
                 // Create a new utterance
                 const utterance = new SpeechSynthesisUtterance(text);
@@ -1316,13 +1254,17 @@
                 utterance.rate = 1;
                 utterance.volume = 1;
 
-                // Start auto mic timer immediately after speech ends
+                // Start mic immediately after speech ends
                 utterance.onend = function () {
-                    if (isAutoMicEnabled && interviewInProgress) {
-                        // Start mic immediately (no delay)
-                        if (!isRecording) {
-                            startRecording();
-                        }
+                    if (interviewInProgress && !isRecording) {
+                        // Clear any existing speech text when resuming
+                        currentSpeechText = '';
+                        speechPreview.style.display = 'none';
+                        speechPreview.textContent = '';
+                        sendButton.disabled = true;
+                        sendButton.textContent = 'Send';
+                        // Resume recording
+                        startRecording();
                     }
                 };
 
