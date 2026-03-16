@@ -740,6 +740,191 @@
         }
 
         /* Category Selection Styles */
+        .category-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 1.5rem 0;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .category-tab {
+            background: none;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .category-tab:hover {
+            color: var(--accent-primary);
+        }
+
+        .category-tab.active {
+            color: var(--accent-primary);
+        }
+
+        .category-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent-primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .domain-group {
+            display: none;
+        }
+
+        .domain-group.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .domain-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1.5rem 0;
+        }
+
+        .domain-btn {
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 2px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .domain-btn:hover {
+            background-color: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+        }
+
+        .custom-btn {
+            background-color: var(--text-secondary);
+        }
+
+        .custom-btn:hover {
+            background-color: var(--text-primary);
+            color: white;
+        }
+
+        .interview-controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        #end-interview-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        #end-interview-btn:hover {
+            background-color: #c82333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-5px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* HR Interview Styles */
+        .hr-interview-content {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .hr-interview-content h3 {
+            color: var(--accent-primary);
+            margin-bottom: 1rem;
+        }
+
+        .resume-upload-section {
+            margin: 2rem 0;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            background-color: var(--bg-secondary);
+        }
+
+        .upload-area:hover {
+            border-color: var(--accent-primary);
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .upload-area.dragover {
+            border-color: var(--accent-primary);
+            background-color: rgba(0, 123, 255, 0.1);
+        }
+
+        .file-info {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: var(--bg-secondary);
+            border-radius: var(--border-radius);
+            border: 1px solid var(--border-color);
+        }
+
+        .file-details {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .remove-file-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .remove-file-btn:hover {
+            background-color: #dc3545;
+            color: white;
+        }
     </style>
 </head>
 
@@ -792,6 +977,7 @@
                     <div class="category-tabs">
                         <button class="category-tab active" data-target="technical-domains">Technical</button>
                         <button class="category-tab" data-target="non-technical-domains">Non-Technical</button>
+                        <button class="category-tab" data-target="hr-interview">HR Interview</button>
                     </div>
 
                     <div id="technical-domains" class="domain-group active">
@@ -815,6 +1001,34 @@
                             <button class="domain-btn" data-domain="marketing">Marketing</button>
                             <button class="domain-btn" data-domain="sales">Sales</button>
                             <button class="domain-btn" data-domain="finance">Finance</button>
+                        </div>
+                    </div>
+
+                    <div id="hr-interview" class="domain-group">
+                        <div class="hr-interview-content">
+                            <h3>HR Interview with Resume Analysis</h3>
+                            <p>Upload your resume (PDF or DOCX) and I'll ask you relevant HR questions based on your experience and skills.</p>
+                            
+                            <div class="resume-upload-section">
+                                <div class="upload-area" id="upload-area">
+                                    <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: var(--accent-primary); margin-bottom: 1rem;"></i>
+                                    <p style="margin: 1rem 0; color: var(--text-secondary);">Drag and drop your resume here or</p>
+                                    <input type="file" id="resume-upload" accept=".pdf,.docx" style="display: none;">
+                                    <button class="domain-btn" id="upload-btn">Choose File</button>
+                                </div>
+                                
+                                <div id="file-info" class="file-info" style="display: none;">
+                                    <div class="file-details">
+                                        <i class="fas fa-file-alt" style="margin-right: 0.5rem;"></i>
+                                        <span id="file-name"></span>
+                                        <button class="remove-file-btn" id="remove-file">✕</button>
+                                    </div>
+                                </div>
+                                
+                                <button class="domain-btn" id="start-hr-interview" style="display: none; background-color: var(--accent-primary); color: white; margin-top: 1rem;">
+                                    Start HR Interview
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -909,6 +1123,15 @@
             const voiceSelect = document.getElementById('voice-select');
             const repeatBtn = document.getElementById('repeat-btn');
             const clarifyBtn = document.getElementById('clarify-btn');
+            
+            // HR Interview Elements
+            const uploadArea = document.getElementById('upload-area');
+            const resumeUpload = document.getElementById('resume-upload');
+            const uploadBtn = document.getElementById('upload-btn');
+            const fileInfo = document.getElementById('file-info');
+            const fileName = document.getElementById('file-name');
+            const removeFileBtn = document.getElementById('remove-file');
+            const startHrInterviewBtn = document.getElementById('start-hr-interview');
 
             // State variables
             let currentDomain = '';
@@ -926,6 +1149,10 @@
             let voices = [];
             let lastQuestion = '';
             let currentSpeechText = '';
+            
+            // HR Interview state
+            let uploadedResume = null;
+            let resumeFileName = '';
 
             // Server URL for AI backend (same as in the original code)
             const serverUrl = "http://127.0.0.1:8000";
@@ -1142,6 +1369,50 @@
                 requestFeedback();
             });
 
+            // HR Interview Upload Event Listeners
+            uploadBtn.addEventListener('click', function () {
+                resumeUpload.click();
+            });
+
+            uploadArea.addEventListener('click', function () {
+                resumeUpload.click();
+            });
+
+            // Drag and drop functionality
+            uploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+
+            uploadArea.addEventListener('dragleave', function (e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+
+            uploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleFileUpload(files[0]);
+                }
+            });
+
+            resumeUpload.addEventListener('change', function (e) {
+                if (e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+
+            removeFileBtn.addEventListener('click', function () {
+                removeUploadedFile();
+            });
+
+            startHrInterviewBtn.addEventListener('click', function () {
+                startHrInterview();
+            });
+
             // Voice message handling function
             async function sendVoiceMessage(transcript) {
                 if (messageBeingSent) return;
@@ -1320,6 +1591,109 @@
                 resetInterview();
             });
 
+            // HR Interview Functions
+            function handleFileUpload(file) {
+                // Validate file type
+                const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                if (!validTypes.includes(file.type)) {
+                    showToast('Please upload a PDF or DOCX file only');
+                    return;
+                }
+
+                // Validate file size (max 5MB)
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    showToast('File size must be less than 5MB');
+                    return;
+                }
+
+                uploadedResume = file;
+                resumeFileName = file.name;
+
+                // Update UI
+                fileName.textContent = file.name;
+                fileInfo.style.display = 'block';
+                startHrInterviewBtn.style.display = 'inline-block';
+
+                showToast('Resume uploaded successfully');
+            }
+
+            function removeUploadedFile() {
+                uploadedResume = null;
+                resumeFileName = '';
+                fileInfo.style.display = 'none';
+                startHrInterviewBtn.style.display = 'none';
+                resumeUpload.value = '';
+                showToast('Resume removed');
+            }
+
+            async function startHrInterview() {
+                if (!uploadedResume) {
+                    showToast('Please upload a resume first');
+                    return;
+                }
+
+                currentDomain = 'hr-interview';
+                interviewInProgress = true;
+                interviewContext = {
+                    sessionId: '',
+                    domain: 'hr-interview',
+                    lastUserResponse: '',
+                    resumeFile: uploadedResume
+                };
+
+                // Switch to interview screen
+                switchToScreen('interview');
+
+                // Clear chat container
+                chatContainer.innerHTML = '';
+
+                // Add system message
+                addMessageToUI('system', `Starting HR interview with resume: ${resumeFileName}`);
+
+                // Create form data for resume upload
+                const formData = new FormData();
+                formData.append('resume', uploadedResume);
+
+                try {
+                    loadingIndicator.style.display = 'flex';
+                    
+                    // Upload resume and start interview
+                    const response = await fetch(`${serverUrl}/api/interview/start-hr`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.session_id) {
+                        interviewContext.sessionId = data.session_id;
+                    }
+
+                    const rawQuestion = data.reply || "Tell me about yourself based on your resume.";
+                    const question = cleanAIResponse(rawQuestion);
+
+                    // Store the question
+                    lastQuestion = question;
+
+                    // Add interviewer message to UI
+                    addMessageToUI('interviewer', question);
+
+                    // Speak the question
+                    speakText(question);
+
+                } catch (error) {
+                    console.error('Error starting HR interview:', error);
+                    addMessageToUI('system', 'Error starting HR interview. Please try again.');
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
+            }
+
             // Functions
             function switchToScreen(screenName) {
                 // Hide all screens
@@ -1345,6 +1719,11 @@
             }
 
             function startInterview(domain) {
+                if (!domain || domain.trim() === '') {
+                    showToast('Please select a domain first');
+                    return;
+                }
+                
                 currentDomain = domain;
                 interviewInProgress = true;
                 interviewContext = {
