@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from dotenv import load_dotenv
@@ -139,6 +139,71 @@ async def start_interview(req: StartInterviewRequest):
     session.questions.append(question)
     
     return {"session_id": session.session_id, "reply": question}
+
+@app.post("/api/interview/start-with-resume")
+async def start_interview_with_resume(domain: str = Form(...), resume: UploadFile = File(...)):
+    # Create interview session
+    session = InterviewManager.create_session(domain)
+    
+    # Read and process resume content
+    try:
+        resume_content = await resume.read()
+        resume_filename = resume.filename
+        content_type = resume.content_type
+        
+        # Extract text based on file type
+        if content_type == 'application/pdf':
+            resume_text = extract_text_from_pdf(resume_content)
+        elif content_type in ['application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'application/msword']:
+            resume_text = extract_text_from_docx(resume_content)
+        else:
+            # Try to decode as text for other formats
+            try:
+                resume_text = resume_content.decode('utf-8', errors='ignore')
+                if len(resume_text.strip()) < 100:
+                    resume_text = f"Resume file: {resume_filename}\nFile type: {content_type}\nThis appears to be a resume document, but text extraction was limited."
+            except:
+                resume_text = f"Resume file: {resume_filename}\nFile type: {content_type}\nThis appears to be a resume document with work experience, education, and skills."
+        
+        # Limit text length to avoid token limits
+        if len(resume_text) > 3000:
+            resume_text = resume_text[:3000] + "\n...(content truncated for processing)"
+            
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Error reading resume: {str(e)}")
+    
+    # Generate domain-specific first question based on resume
+    resume_prompt = f"""You are conducting a {domain} interview. The candidate has uploaded their resume with the following content:
+
+Resume Content:
+{resume_text}
+
+Based on this resume and the {domain} domain, ask a relevant question that would help you understand:
+1. The candidate's relevant experience and skills for this domain
+2. Their technical knowledge or expertise in {domain}
+3. Their problem-solving abilities and approach
+4. Their career goals and motivations related to {domain}
+
+Important guidelines:
+- Ask a natural, conversational question relevant to {domain}
+- Don't explicitly mention "I saw on your resume"
+- Make it sound like you're genuinely interested in their background
+- Focus on their experience, skills, or aspirations relevant to {domain}
+- Keep it professional and engaging
+- Ask only one question at a time
+
+Ask your first question:"""
+
+    try:
+        question = await call_gemini(resume_prompt)
+        
+        # Store resume context in the session for future questions
+        session.resume_context = resume_text
+        
+        return {"session_id": session.session_id, "reply": question}
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating question: {str(e)}")
 
 @app.post("/api/interview/start-hr")
 async def start_hr_interview(resume: UploadFile = File(...)):

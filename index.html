@@ -941,6 +941,84 @@
             background-color: #dc3545;
             color: white;
         }
+
+        /* Camera Styles */
+        .camera-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            width: 200px;
+            height: 150px;
+            background: #000;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .camera-container.minimized {
+            width: 60px;
+            height: 60px;
+        }
+
+        .camera-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-controls {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            display: flex;
+            gap: 5px;
+        }
+
+        .camera-btn {
+            background: rgba(0, 0, 0, 0.5);
+            border: none;
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .camera-btn:hover {
+            background: rgba(0, 0, 0, 0.8);
+        }
+
+        .camera-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            background: linear-gradient(45deg, #333, #555);
+        }
+
+        @media (max-width: 768px) {
+            .camera-container {
+                width: 120px;
+                height: 90px;
+                top: 70px;
+                right: 10px;
+            }
+            
+            .camera-container.minimized {
+                width: 40px;
+                height: 40px;
+            }
+        }
     </style>
 </head>
 
@@ -1008,6 +1086,26 @@
                             <button class="domain-btn" data-domain="lld">Low-Level Design (LLD)</button>
                             <button class="domain-btn" data-domain="cad">CAD Design</button>
                         </div>
+                        
+                        <div class="resume-upload-section">
+                            <p style="text-align: center; color: var(--text-secondary); margin: 1rem 0;">
+                                <i class="fas fa-info-circle"></i> Optional: Upload your resume for personalized questions
+                            </p>
+                            <div class="upload-area" id="technical-upload-area">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--accent-primary); margin-bottom: 0.5rem;"></i>
+                                <p style="margin: 0.5rem 0; color: var(--text-secondary); font-size: 0.9rem;">Drag and drop your resume here or</p>
+                                <input type="file" id="technical-resume-upload" accept=".pdf,.docx" style="display: none;">
+                                <button class="domain-btn" id="technical-upload-btn" style="font-size: 0.9rem; padding: 0.5rem 1rem;">Choose File</button>
+                            </div>
+                            
+                            <div id="technical-file-info" class="file-info" style="display: none;">
+                                <div class="file-details">
+                                    <i class="fas fa-file-alt" style="margin-right: 0.5rem;"></i>
+                                    <span id="technical-file-name"></span>
+                                    <button class="remove-file-btn" id="technical-remove-file">✕</button>
+                            </div>
+                            </div>
+                        </div>
                     </div>
 
                     <div id="non-technical-domains" class="domain-group">
@@ -1017,6 +1115,26 @@
                             <button class="domain-btn" data-domain="marketing">Marketing</button>
                             <button class="domain-btn" data-domain="sales">Sales</button>
                             <button class="domain-btn" data-domain="finance">Finance</button>
+                        </div>
+                        
+                        <div class="resume-upload-section">
+                            <p style="text-align: center; color: var(--text-secondary); margin: 1rem 0;">
+                                <i class="fas fa-info-circle"></i> Optional: Upload your resume for personalized questions
+                            </p>
+                            <div class="upload-area" id="non-technical-upload-area">
+                                <i class="fas fa-cloud-upload-alt" style="font-size: 2rem; color: var(--accent-primary); margin-bottom: 0.5rem;"></i>
+                                <p style="margin: 0.5rem 0; color: var(--text-secondary); font-size: 0.9rem;">Drag and drop your resume here or</p>
+                                <input type="file" id="non-technical-resume-upload" accept=".pdf,.docx" style="display: none;">
+                                <button class="domain-btn" id="non-technical-upload-btn" style="font-size: 0.9rem; padding: 0.5rem 1rem;">Choose File</button>
+                            </div>
+                            
+                            <div id="non-technical-file-info" class="file-info" style="display: none;">
+                                <div class="file-details">
+                                    <i class="fas fa-file-alt" style="margin-right: 0.5rem;"></i>
+                                    <span id="non-technical-file-name"></span>
+                                    <button class="remove-file-btn" id="non-technical-remove-file">✕</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1109,6 +1227,22 @@
         </div>
     </div>
 
+    <!-- Camera Container -->
+    <div class="camera-container" id="camera-container" style="display: none;">
+        <video class="camera-video" id="camera-video" autoplay muted></video>
+        <div class="camera-placeholder" id="camera-placeholder">
+            <i class="fas fa-video" style="margin-right: 0.5rem;"></i> Camera Off
+        </div>
+        <div class="camera-controls">
+            <button class="camera-btn" id="camera-toggle" title="Toggle Camera">
+                <i class="fas fa-video"></i>
+            </button>
+            <button class="camera-btn" id="camera-minimize" title="Minimize">
+                <i class="fas fa-minus"></i>
+            </button>
+        </div>
+    </div>
+
     <!-- Toast notification element -->
     <div class="toast" id="toast"></div>
 
@@ -1149,6 +1283,29 @@
             const removeFileBtn = document.getElementById('remove-file');
             const startHrInterviewBtn = document.getElementById('start-hr-interview');
 
+            // Technical Resume Elements
+            const technicalUploadArea = document.getElementById('technical-upload-area');
+            const technicalResumeUpload = document.getElementById('technical-resume-upload');
+            const technicalUploadBtn = document.getElementById('technical-upload-btn');
+            const technicalFileInfo = document.getElementById('technical-file-info');
+            const technicalFileName = document.getElementById('technical-file-name');
+            const technicalRemoveFileBtn = document.getElementById('technical-remove-file');
+            
+            // Non-Technical Resume Elements
+            const nonTechnicalUploadArea = document.getElementById('non-technical-upload-area');
+            const nonTechnicalResumeUpload = document.getElementById('non-technical-resume-upload');
+            const nonTechnicalUploadBtn = document.getElementById('non-technical-upload-btn');
+            const nonTechnicalFileInfo = document.getElementById('non-technical-file-info');
+            const nonTechnicalFileName = document.getElementById('non-technical-file-name');
+            const nonTechnicalRemoveFileBtn = document.getElementById('non-technical-remove-file');
+            
+            // Camera Elements
+            const cameraContainer = document.getElementById('camera-container');
+            const cameraVideo = document.getElementById('camera-video');
+            const cameraPlaceholder = document.getElementById('camera-placeholder');
+            const cameraToggle = document.getElementById('camera-toggle');
+            const cameraMinimize = document.getElementById('camera-minimize');
+
             // State variables
             let currentDomain = '';
             let interviewInProgress = false;
@@ -1169,6 +1326,17 @@
             // HR Interview state
             let uploadedResume = null;
             let resumeFileName = '';
+            
+            // Technical and Non-Technical Resume state
+            let technicalResume = null;
+            let technicalResumeFileName = '';
+            let nonTechnicalResume = null;
+            let nonTechnicalResumeFileName = '';
+            
+            // Camera state
+            let cameraStream = null;
+            let isCameraOn = false;
+            let isCameraMinimized = false;
 
             // Server URL for AI backend (Render deployment)
             const serverUrl = "https://ai-mock-interviewer-crjx.onrender.com";
@@ -1427,6 +1595,95 @@
 
             startHrInterviewBtn.addEventListener('click', function () {
                 startHrInterview();
+            });
+
+            // Technical Resume Upload Event Listeners
+            technicalUploadBtn.addEventListener('click', function () {
+                technicalResumeUpload.click();
+            });
+
+            technicalUploadArea.addEventListener('click', function () {
+                technicalResumeUpload.click();
+            });
+
+            // Technical Drag and drop functionality
+            technicalUploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                technicalUploadArea.classList.add('dragover');
+            });
+
+            technicalUploadArea.addEventListener('dragleave', function (e) {
+                e.preventDefault();
+                technicalUploadArea.classList.remove('dragover');
+            });
+
+            technicalUploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                technicalUploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleTechnicalFileUpload(files[0]);
+                }
+            });
+
+            technicalResumeUpload.addEventListener('change', function (e) {
+                if (e.target.files.length > 0) {
+                    handleTechnicalFileUpload(e.target.files[0]);
+                }
+            });
+
+            technicalRemoveFileBtn.addEventListener('click', function () {
+                removeTechnicalUploadedFile();
+            });
+
+            // Non-Technical Resume Upload Event Listeners
+            nonTechnicalUploadBtn.addEventListener('click', function () {
+                nonTechnicalResumeUpload.click();
+            });
+
+            nonTechnicalUploadArea.addEventListener('click', function () {
+                nonTechnicalResumeUpload.click();
+            });
+
+            // Non-Technical Drag and drop functionality
+            nonTechnicalUploadArea.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                nonTechnicalUploadArea.classList.add('dragover');
+            });
+
+            nonTechnicalUploadArea.addEventListener('dragleave', function (e) {
+                e.preventDefault();
+                nonTechnicalUploadArea.classList.remove('dragover');
+            });
+
+            nonTechnicalUploadArea.addEventListener('drop', function (e) {
+                e.preventDefault();
+                nonTechnicalUploadArea.classList.remove('dragover');
+                
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    handleNonTechnicalFileUpload(files[0]);
+                }
+            });
+
+            nonTechnicalResumeUpload.addEventListener('change', function (e) {
+                if (e.target.files.length > 0) {
+                    handleNonTechnicalFileUpload(e.target.files[0]);
+                }
+            });
+
+            nonTechnicalRemoveFileBtn.addEventListener('click', function () {
+                removeNonTechnicalUploadedFile();
+            });
+
+            // Camera Event Listeners
+            cameraToggle.addEventListener('click', function () {
+                toggleCamera();
+            });
+
+            cameraMinimize.addEventListener('click', function () {
+                toggleCameraMinimize();
             });
 
             // Voice message handling function
@@ -1710,6 +1967,133 @@
                 }
             }
 
+            // Technical Resume Functions
+            function handleTechnicalFileUpload(file) {
+                // Validate file type
+                const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                if (!validTypes.includes(file.type)) {
+                    showToast('Please upload a PDF or DOCX file only');
+                    return;
+                }
+
+                // Validate file size (max 5MB)
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    showToast('File size must be less than 5MB');
+                    return;
+                }
+
+                technicalResume = file;
+                technicalResumeFileName = file.name;
+
+                // Update UI
+                technicalFileName.textContent = file.name;
+                technicalFileInfo.style.display = 'block';
+
+                showToast('Resume uploaded successfully');
+            }
+
+            function removeTechnicalUploadedFile() {
+                technicalResume = null;
+                technicalResumeFileName = '';
+                technicalFileInfo.style.display = 'none';
+                technicalResumeUpload.value = '';
+                showToast('Resume removed');
+            }
+
+            // Non-Technical Resume Functions
+            function handleNonTechnicalFileUpload(file) {
+                // Validate file type
+                const validTypes = ['application/pdf', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+                if (!validTypes.includes(file.type)) {
+                    showToast('Please upload a PDF or DOCX file only');
+                    return;
+                }
+
+                // Validate file size (max 5MB)
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                if (file.size > maxSize) {
+                    showToast('File size must be less than 5MB');
+                    return;
+                }
+
+                nonTechnicalResume = file;
+                nonTechnicalResumeFileName = file.name;
+
+                // Update UI
+                nonTechnicalFileName.textContent = file.name;
+                nonTechnicalFileInfo.style.display = 'block';
+
+                showToast('Resume uploaded successfully');
+            }
+
+            function removeNonTechnicalUploadedFile() {
+                nonTechnicalResume = null;
+                nonTechnicalResumeFileName = '';
+                nonTechnicalFileInfo.style.display = 'none';
+                nonTechnicalResumeUpload.value = '';
+                showToast('Resume removed');
+            }
+
+            // Camera Functions
+            async function toggleCamera() {
+                if (!isCameraOn) {
+                    await startCamera();
+                } else {
+                    stopCamera();
+                }
+            }
+
+            async function startCamera() {
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { 
+                            width: { ideal: 640 },
+                            height: { ideal: 480 }
+                        } 
+                    });
+                    
+                    cameraVideo.srcObject = cameraStream;
+                    cameraVideo.style.display = 'block';
+                    cameraPlaceholder.style.display = 'none';
+                    cameraContainer.style.display = 'block';
+                    
+                    isCameraOn = true;
+                    cameraToggle.innerHTML = '<i class="fas fa-video-slash"></i>';
+                    showToast('Camera started');
+                } catch (error) {
+                    console.error('Error accessing camera:', error);
+                    showToast('Failed to access camera. Please check permissions.');
+                }
+            }
+
+            function stopCamera() {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                    cameraStream = null;
+                }
+                
+                cameraVideo.style.display = 'none';
+                cameraPlaceholder.style.display = 'flex';
+                cameraContainer.style.display = 'none';
+                
+                isCameraOn = false;
+                cameraToggle.innerHTML = '<i class="fas fa-video"></i>';
+                showToast('Camera stopped');
+            }
+
+            function toggleCameraMinimize() {
+                isCameraMinimized = !isCameraMinimized;
+                
+                if (isCameraMinimized) {
+                    cameraContainer.classList.add('minimized');
+                    cameraMinimize.innerHTML = '<i class="fas fa-plus"></i>';
+                } else {
+                    cameraContainer.classList.remove('minimized');
+                    cameraMinimize.innerHTML = '<i class="fas fa-minus"></i>';
+                }
+            }
+
             // Functions
             function switchToScreen(screenName) {
                 // Hide all screens
@@ -1757,8 +2141,81 @@
                 // Add system message
                 addMessageToUI('system', `Starting interview in ${domain} (Basic questions phase)`);
 
-                // Request first question
-                requestNextQuestion();
+                // Start camera if available
+                startCamera();
+
+                // Check if we have a resume for this domain and handle it
+                let resumeFile = null;
+                let resumeFileName = '';
+                
+                if (document.getElementById('technical-domains').classList.contains('active')) {
+                    resumeFile = technicalResume;
+                    resumeFileName = technicalResumeFileName;
+                } else if (document.getElementById('non-technical-domains').classList.contains('active')) {
+                    resumeFile = nonTechnicalResume;
+                    resumeFileName = nonTechnicalResumeFileName;
+                }
+
+                if (resumeFile) {
+                    // Add system message about resume
+                    addMessageToUI('system', `Resume uploaded: ${resumeFileName}`);
+                    
+                    // Store resume in interview context
+                    interviewContext.resumeFile = resumeFile;
+                    
+                    // Start interview with resume
+                    startInterviewWithResume(domain, resumeFile);
+                } else {
+                    // Request first question without resume
+                    requestNextQuestion();
+                }
+            }
+
+            async function startInterviewWithResume(domain, resumeFile) {
+                // Create form data for resume upload
+                const formData = new FormData();
+                formData.append('resume', resumeFile);
+                formData.append('domain', domain);
+
+                try {
+                    loadingIndicator.style.display = 'flex';
+                    
+                    // Upload resume and start interview
+                    const response = await fetch(`${serverUrl}/api/interview/start-with-resume`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+
+                    const data = await response.json();
+                    
+                    if (data.session_id) {
+                        interviewContext.sessionId = data.session_id;
+                    }
+
+                    const rawQuestion = data.reply || "Tell me about yourself based on your resume.";
+                    const question = cleanAIResponse(rawQuestion);
+
+                    // Store the question
+                    lastQuestion = question;
+
+                    // Add interviewer message to UI
+                    addMessageToUI('interviewer', question);
+
+                    // Speak the question
+                    speakText(question);
+
+                } catch (error) {
+                    console.error('Error starting interview with resume:', error);
+                    addMessageToUI('system', 'Error starting interview with resume. Please try again.');
+                    // Fallback to regular interview
+                    requestNextQuestion();
+                } finally {
+                    loadingIndicator.style.display = 'none';
+                }
             }
 
             function resetInterview() {
@@ -1772,6 +2229,9 @@
                 lastQuestion = '';
                 currentSpeechText = '';
 
+                // Stop camera
+                stopCamera();
+
                 // Clear chat container
                 chatContainer.innerHTML = '';
 
@@ -1780,6 +2240,11 @@
 
                 // Stop any ongoing speech
                 if (synth) synth.cancel();
+            }
+
+            function clearAutoMicTimer() {
+                // This function can be used to clear any auto-mic timers
+                // For now, it's a placeholder as we're not using auto-mic
             }
 
             // Check if message is a command

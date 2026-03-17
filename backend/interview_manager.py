@@ -15,6 +15,7 @@ class InterviewSession:
         self.current_question_index = 0
         self.interview_stage = 'basic'
         self.last_user_response = ''
+        self.resume_context: Optional[str] = None
 
     def to_dict(self):
         return {
@@ -34,6 +35,12 @@ class InterviewSession:
             formatted.append(f"Interview Domain: {self.domain}")
         
         formatted.append(f"Interview Stage: {self.interview_stage}")
+        
+        # Add resume context if available
+        if self.resume_context:
+            formatted.append("\nResume Context:")
+            formatted.append(self.resume_context)
+        
         formatted.append("\nInterview History:")
 
         # Pair questions with answers
