@@ -205,6 +205,72 @@ Ask your first question:"""
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error generating question: {str(e)}")
 
+@app.post("/api/audio/analyze")
+async def analyze_audio(audio_data: dict):
+    try:
+        audio_base64 = audio_data.get("audio")
+        interview_context = audio_data.get("interview_context", {})
+        
+        if not audio_base64:
+            raise HTTPException(status_code=400, detail="No audio data provided")
+        
+        # Decode base64 audio
+        import base64
+        audio_bytes = base64.b64decode(audio_base64)
+        
+        # Create a temporary file for the audio
+        import tempfile
+        import os
+        
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".webm") as temp_file:
+            temp_file.write(audio_bytes)
+            temp_file_path = temp_file.name
+        
+        try:
+            # Analyze audio with Gemini
+            analysis_prompt = f"""Analyze this audio recording of an interview response and provide detailed feedback on the following aspects:
+
+1. **Speaking Pace**: Rate as Slow, Normal, or Fast
+2. **Confidence Level**: Rate as Low, Medium, or High  
+3. **Emotion Detected**: Identify the primary emotion (Confident, Nervous, Enthusiastic, Neutral, etc.)
+4. **Clarity Score**: Rate from 1-10 for speech clarity
+5. **Filler Words**: Count and list common filler words used (um, uh, like, you know, etc.)
+
+Interview Context:
+- Domain: {interview_context.get('domain', 'Unknown')}
+- Session ID: {interview_context.get('sessionId', 'Unknown')}
+
+Provide your analysis in JSON format with the following structure:
+{{
+    "speaking_pace": "Normal",
+    "confidence_level": "Medium", 
+    "emotion_detected": "Confident",
+    "clarity_score": "8/10",
+    "filler_words": "um: 3, uh: 2, like: 1"
+}}
+
+Focus on providing constructive feedback that would help the candidate improve their interview performance."""
+
+            # For now, return a mock analysis since we don't have Gemini audio processing set up
+            # In a real implementation, you would send the audio to Gemini for analysis
+            mock_analysis = {
+                "speaking_pace": "Normal",
+                "confidence_level": "Medium",
+                "emotion_detected": "Confident", 
+                "clarity_score": "7/10",
+                "filler_words": "um: 2, uh: 1"
+            }
+            
+            return mock_analysis
+            
+        finally:
+            # Clean up temporary file
+            if os.path.exists(temp_file_path):
+                os.unlink(temp_file_path)
+                
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error analyzing audio: {str(e)}")
+
 @app.post("/api/interview/start-hr")
 async def start_hr_interview(resume: UploadFile = File(...)):
     # Create HR interview session

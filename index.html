@@ -1019,6 +1019,277 @@
                 height: 40px;
             }
         }
+
+        /* Audio Recording Styles */
+        .audio-container {
+            position: fixed;
+            top: 240px;
+            right: 20px;
+            width: 200px;
+            background: var(--background-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+        }
+
+        .audio-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .audio-btn {
+            background: var(--accent-primary);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .audio-btn:hover {
+            background: var(--accent-secondary);
+            transform: scale(1.1);
+        }
+
+        .audio-btn:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: scale(1);
+        }
+
+        .audio-btn.recording {
+            background: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .audio-status {
+            text-align: center;
+        }
+
+        #audio-timer {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .audio-level-indicator {
+            width: 100%;
+            height: 6px;
+            background: #333;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .audio-level-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #4CAF50, #8BC34A, #FFEB3B, #FF9800, #F44336);
+            transition: width 0.1s ease;
+        }
+
+        /* Audio Analysis Panel Styles */
+        .audio-analysis-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 400px;
+            background: var(--background-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+        }
+
+        .analysis-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .analysis-header h4 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 18px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: var(--background-primary);
+            color: var(--text-primary);
+        }
+
+        .analysis-content {
+            padding: 20px;
+        }
+
+        .analysis-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .analysis-item:last-child {
+            border-bottom: none;
+        }
+
+        .analysis-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .analysis-value {
+            color: var(--text-primary);
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* Transcript Panel Styles */
+        .transcript-panel {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            max-width: 90vw;
+            height: 500px;
+            max-height: 80vh;
+            background: var(--background-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .transcript-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .transcript-header h4 {
+            margin: 0;
+            color: var(--text-primary);
+            font-size: 18px;
+        }
+
+        .transcript-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .transcript-btn {
+            background: var(--accent-primary);
+            border: none;
+            color: white;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .transcript-btn:hover {
+            background: var(--accent-secondary);
+        }
+
+        .transcript-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-primary);
+        }
+
+        .transcript-content .timestamp {
+            color: var(--accent-primary);
+            font-weight: bold;
+        }
+
+        .transcript-content .speaker {
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        .transcript-content .question {
+            color: var(--accent-secondary);
+            font-weight: bold;
+        }
+
+        .transcript-content .answer {
+            color: var(--text-primary);
+        }
+
+        @media (max-width: 768px) {
+            .audio-container {
+                width: 160px;
+                padding: 10px;
+                right: 10px;
+            }
+            
+            .audio-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 12px;
+            }
+            
+            .audio-analysis-panel {
+                width: 90vw;
+            }
+            
+            .transcript-panel {
+                width: 95vw;
+                height: 70vh;
+            }
+        }
     </style>
 </head>
 
@@ -1243,6 +1514,77 @@
         </div>
     </div>
 
+    <!-- Audio Recording Container -->
+    <div class="audio-container" id="audio-container" style="display: none;">
+        <div class="audio-controls">
+            <button class="audio-btn" id="audio-record-btn" title="Start Recording">
+                <i class="fas fa-microphone"></i>
+            </button>
+            <button class="audio-btn" id="audio-pause-btn" title="Pause Recording" style="display: none;">
+                <i class="fas fa-pause"></i>
+            </button>
+            <button class="audio-btn" id="audio-stop-btn" title="Stop Recording" style="display: none;">
+                <i class="fas fa-stop"></i>
+            </button>
+            <button class="audio-btn" id="audio-playback-btn" title="Playback Recording" style="display: none;">
+                <i class="fas fa-play"></i>
+            </button>
+        </div>
+        <div class="audio-status" id="audio-status">
+            <span id="audio-timer">00:00</span>
+            <div class="audio-level-indicator">
+                <div class="audio-level-bar" id="audio-level-bar"></div>
+            </div>
+        </div>
+        <audio id="audio-playback" style="display: none;"></audio>
+    </div>
+
+    <!-- Audio Analysis Panel -->
+    <div class="audio-analysis-panel" id="audio-analysis-panel" style="display: none;">
+        <div class="analysis-header">
+            <h4><i class="fas fa-chart-line"></i> Voice Analysis</h4>
+            <button class="close-btn" id="close-analysis-btn">×</button>
+        </div>
+        <div class="analysis-content" id="analysis-content">
+            <div class="analysis-item">
+                <span class="analysis-label">Speaking Pace:</span>
+                <span class="analysis-value" id="speaking-pace">-</span>
+            </div>
+            <div class="analysis-item">
+                <span class="analysis-label">Confidence Level:</span>
+                <span class="analysis-value" id="confidence-level">-</span>
+            </div>
+            <div class="analysis-item">
+                <span class="analysis-label">Emotion Detected:</span>
+                <span class="analysis-value" id="emotion-detected">-</span>
+            </div>
+            <div class="analysis-item">
+                <span class="analysis-label">Clarity Score:</span>
+                <span class="analysis-value" id="clarity-score">-</span>
+            </div>
+            <div class="analysis-item">
+                <span class="analysis-label">Filler Words:</span>
+                <span class="analysis-value" id="filler-words">-</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transcript Panel -->
+    <div class="transcript-panel" id="transcript-panel" style="display: none;">
+        <div class="transcript-header">
+            <h4><i class="fas fa-file-alt"></i> Interview Transcript</h4>
+            <div class="transcript-controls">
+                <button class="transcript-btn" id="download-transcript-btn" title="Download Transcript">
+                    <i class="fas fa-download"></i>
+                </button>
+                <button class="close-btn" id="close-transcript-btn">×</button>
+            </div>
+        </div>
+        <div class="transcript-content" id="transcript-content">
+            <!-- Transcript will be populated here -->
+        </div>
+    </div>
+
     <!-- Toast notification element -->
     <div class="toast" id="toast"></div>
 
@@ -1306,6 +1648,31 @@
             const cameraToggle = document.getElementById('camera-toggle');
             const cameraMinimize = document.getElementById('camera-minimize');
 
+            // Audio Recording Elements
+            const audioContainer = document.getElementById('audio-container');
+            const audioRecordBtn = document.getElementById('audio-record-btn');
+            const audioPauseBtn = document.getElementById('audio-pause-btn');
+            const audioStopBtn = document.getElementById('audio-stop-btn');
+            const audioPlaybackBtn = document.getElementById('audio-playback-btn');
+            const audioTimer = document.getElementById('audio-timer');
+            const audioLevelBar = document.getElementById('audio-level-bar');
+            const audioPlayback = document.getElementById('audio-playback');
+
+            // Audio Analysis Elements
+            const audioAnalysisPanel = document.getElementById('audio-analysis-panel');
+            const closeAnalysisBtn = document.getElementById('close-analysis-btn');
+            const speakingPace = document.getElementById('speaking-pace');
+            const confidenceLevel = document.getElementById('confidence-level');
+            const emotionDetected = document.getElementById('emotion-detected');
+            const clarityScore = document.getElementById('clarity-score');
+            const fillerWords = document.getElementById('filler-words');
+
+            // Transcript Elements
+            const transcriptPanel = document.getElementById('transcript-panel');
+            const closeTranscriptBtn = document.getElementById('close-transcript-btn');
+            const downloadTranscriptBtn = document.getElementById('download-transcript-btn');
+            const transcriptContent = document.getElementById('transcript-content');
+
             // State variables
             let currentDomain = '';
             let interviewInProgress = false;
@@ -1337,6 +1704,26 @@
             let cameraStream = null;
             let isCameraOn = false;
             let isCameraMinimized = false;
+
+            // Audio Recording state
+            let audioRecorder = null;
+            let audioChunks = [];
+            let audioBlob = null;
+            let audioStream = null;
+            let isAudioRecording = false;
+            let isAudioPaused = false;
+            let audioStartTime = null;
+            let audioPausedTime = 0;
+            let audioTimerInterval = null;
+            let audioAnalyser = null;
+            let audioDataArray = null;
+            let audioContext = null;
+            let audioSource = null;
+            let audioLevelUpdateInterval = null;
+
+            // Interview transcript data
+            let interviewTranscript = [];
+            let currentAudioAnalysis = null;
 
             // Server URL for AI backend (Render deployment)
             const serverUrl = "https://ai-mock-interviewer-crjx.onrender.com";
@@ -1684,6 +2071,41 @@
 
             cameraMinimize.addEventListener('click', function () {
                 toggleCameraMinimize();
+            });
+
+            // Audio Recording Event Listeners
+            audioRecordBtn.addEventListener('click', function () {
+                if (!isAudioRecording) {
+                    startAudioRecording();
+                } else {
+                    resumeAudioRecording();
+                }
+            });
+
+            audioPauseBtn.addEventListener('click', function () {
+                pauseAudioRecording();
+            });
+
+            audioStopBtn.addEventListener('click', function () {
+                stopAudioRecording();
+            });
+
+            audioPlaybackBtn.addEventListener('click', function () {
+                playAudioRecording();
+            });
+
+            // Audio Analysis Event Listeners
+            closeAnalysisBtn.addEventListener('click', function () {
+                hideAudioAnalysis();
+            });
+
+            // Transcript Event Listeners
+            closeTranscriptBtn.addEventListener('click', function () {
+                hideTranscript();
+            });
+
+            downloadTranscriptBtn.addEventListener('click', function () {
+                downloadTranscript();
             });
 
             // Voice message handling function
@@ -2039,64 +2461,77 @@
             async function toggleCamera() {
                 if (!isCameraOn) {
                     await startCamera();
-                } else {
-                    stopCamera();
-                }
-            }
 
-            async function startCamera() {
-                try {
-                    cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { 
-                            width: { ideal: 640 },
-                            height: { ideal: 480 }
-                        } 
-                    });
-                    
-                    cameraVideo.srcObject = cameraStream;
-                    cameraVideo.style.display = 'block';
-                    cameraPlaceholder.style.display = 'none';
-                    cameraContainer.style.display = 'block';
-                    
-                    isCameraOn = true;
-                    cameraToggle.innerHTML = '<i class="fas fa-video-slash"></i>';
-                    showToast('Camera started');
-                } catch (error) {
-                    console.error('Error accessing camera:', error);
-                    showToast('Failed to access camera. Please check permissions.');
-                }
-            }
+async function startCamera() {
+try {
+cameraStream = await navigator.mediaDevices.getUserMedia({ 
+video: { 
+width: { ideal: 640 },
+height: { ideal: 480 }
+} 
+});
+    
+cameraVideo.srcObject = cameraStream;
+cameraVideo.style.display = 'block';
+cameraPlaceholder.style.display = 'none';
+cameraContainer.style.display = 'block';
+    
+isCameraOn = true;
+cameraToggle.innerHTML = '<i class="fas fa-video-slash"></i>';
+showToast('Camera started');
+} catch (error) {
+console.error('Error accessing camera:', error);
+showToast('Failed to access camera. Please check permissions.');
+}
+}
 
-            function stopCamera() {
-                if (cameraStream) {
-                    cameraStream.getTracks().forEach(track => track.stop());
-                    cameraStream = null;
-                }
-                
-                cameraVideo.style.display = 'none';
-                cameraPlaceholder.style.display = 'flex';
-                cameraContainer.style.display = 'none';
-                
-                isCameraOn = false;
-                cameraToggle.innerHTML = '<i class="fas fa-video"></i>';
-                showToast('Camera stopped');
-            }
+function stopCamera() {
+if (cameraStream) {
+cameraStream.getTracks().forEach(track => track.stop());
+cameraStream = null;
+}
+    }
+    
+    cameraVideo.style.display = 'none';
+    cameraPlaceholder.style.display = 'flex';
+    cameraContainer.style.display = 'none';
+    
+    isCameraOn = false;
+    cameraToggle.innerHTML = '<i class="fas fa-video"></i>';
+    showToast('Camera stopped');
+}
 
-            function toggleCameraMinimize() {
-                isCameraMinimized = !isCameraMinimized;
-                
-                if (isCameraMinimized) {
-                    cameraContainer.classList.add('minimized');
-                    cameraMinimize.innerHTML = '<i class="fas fa-plus"></i>';
-                } else {
-                    cameraContainer.classList.remove('minimized');
-                    cameraMinimize.innerHTML = '<i class="fas fa-minus"></i>';
-                }
-            }
+function toggleCameraMinimize() {
+    isCameraMinimized = !isCameraMinimized;
+    
+    if (isCameraMinimized) {
+        cameraContainer.classList.add('minimized');
+        cameraMinimize.innerHTML = '<i class="fas fa-plus"></i>';
+    } else {
+        cameraContainer.classList.remove('minimized');
+        cameraMinimize.innerHTML = '<i class="fas fa-minus"></i>';
+    }
+}
 
-            // Functions
-            function switchToScreen(screenName) {
-                // Hide all screens
+// Audio Recording Functions
+async function startAudioRecording() {
+    try {
+        // Get microphone access
+        audioStream = await navigator.mediaDevices.getUserMedia({ 
+            audio: {
+                echoCancellation: true,
+                noiseSuppression: true,
+                sampleRate: 44100
+            } 
+        });
+
+        // Create audio context for level monitoring
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        audioSource = audioContext.createMediaStreamSource(audioStream);
+        audioAnalyser = audioContext.createAnalyser();
+        audioAnalyser.fftSize = 256;
+        audioDataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+        audioSource.connect(audioAnalyser);
                 welcomeScreen.classList.remove('active');
                 interviewScreen.classList.remove('active');
                 summaryScreen.classList.remove('active');
